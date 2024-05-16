@@ -30,7 +30,7 @@ struct Forum : View {
     
     @State private var lists : [Post] = Post.list
     @State private var showAddView : Bool = false
-    @ObservedObject var postVM = PostViewModel()
+    @StateObject var postVM = PostViewModel()
     
     
     var body: some View {
@@ -39,7 +39,7 @@ struct Forum : View {
             LazyVStack {
                 ForEach(postVM.list) { post in
                     NavigationLink {
-                        PostDetail(post: post)
+                        PostDetail(postVM: postVM, post: post)
                     } label: {
                         PostRow(post: post)
                     }
@@ -60,7 +60,7 @@ struct Forum : View {
             .padding()
         }
         .sheet(isPresented: $showAddView) {
-            PostAdd()
+            PostAdd(postVM: postVM)
         }
         
         
@@ -81,7 +81,7 @@ struct PostAdd : View {
     @Environment(\.dismiss) private var dismiss
     @State private var text : String = ""
     
-    @ObservedObject var postVM = PostViewModel()
+    @ObservedObject var postVM : PostViewModel
     
     var body: some View {
         NavigationView {
@@ -120,6 +120,7 @@ struct PostAdd : View {
 struct PostDetail : View {
     
     @State private var showEditView : Bool = false
+    @ObservedObject var postVM : PostViewModel
     
     let post : Post
     
@@ -137,7 +138,7 @@ struct PostDetail : View {
             }
             
             .sheet(isPresented: $showEditView, content: {
-                PostAdd()
+                PostAdd(postVM: postVM)
             })
         }
 
