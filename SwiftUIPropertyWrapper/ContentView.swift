@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @StateObject var postVM = PostViewModel()
+    
     var body: some View {
         NavigationView {
             TabView {
@@ -23,6 +26,7 @@ struct ContentView: View {
             }
             .navigationTitle("Scrum 스터디 방")
         }
+        .environmentObject(postVM)
     }
 }
 
@@ -30,8 +34,7 @@ struct Forum : View {
     
     @State private var lists : [Post] = Post.list
     @State private var showAddView : Bool = false
-    @StateObject var postVM = PostViewModel()
-    
+    @EnvironmentObject var postVM : PostViewModel
     
     var body: some View {
         
@@ -39,7 +42,7 @@ struct Forum : View {
             LazyVStack {
                 ForEach(postVM.list) { post in
                     NavigationLink {
-                        PostDetail(postVM: postVM, post: post)
+                        PostDetail(post: post)
                     } label: {
                         PostRow(post: post)
                     }
@@ -60,7 +63,7 @@ struct Forum : View {
             .padding()
         }
         .sheet(isPresented: $showAddView) {
-            PostAdd(postVM: postVM)
+            PostAdd()
         }
         
         
@@ -81,7 +84,7 @@ struct PostAdd : View {
     @Environment(\.dismiss) private var dismiss
     @State private var text : String = ""
     
-    @ObservedObject var postVM : PostViewModel
+    @EnvironmentObject var postVM : PostViewModel
     
     var body: some View {
         NavigationView {
@@ -120,7 +123,6 @@ struct PostAdd : View {
 struct PostDetail : View {
     
     @State private var showEditView : Bool = false
-    @ObservedObject var postVM : PostViewModel
     
     let post : Post
     
@@ -137,8 +139,8 @@ struct PostDetail : View {
                 Text("수정")
             }
             
-            .sheet(isPresented: $showEditView, content: {
-                PostAdd(postVM: postVM)
+            .fullScreenCover(isPresented: $showEditView, content: {
+                PostAdd()
             })
         }
 
